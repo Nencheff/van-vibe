@@ -4,16 +4,19 @@ import {
     collection,
     doc,
     getDocs,
-    getDoc
+    getDoc,
+    query,
+    where,
+    documentId
 } from "firebase/firestore/lite"
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAnWIfp58aWbI51kAHu5b1drJf4g6IfH0Y",
-  authDomain: "vanvibe-af8b4.firebaseapp.com",
-  projectId: "vanvibe-af8b4",
-  storageBucket: "vanvibe-af8b4.firebasestorage.app",
-  messagingSenderId: "996961822073",
-  appId: "1:996961822073:web:0babde6c0d0ef4190f3ba8"
+    apiKey: "AIzaSyAnWIfp58aWbI51kAHu5b1drJf4g6IfH0Y",
+    authDomain: "vanvibe-af8b4.firebaseapp.com",
+    projectId: "vanvibe-af8b4",
+    storageBucket: "vanvibe-af8b4.firebasestorage.app",
+    messagingSenderId: "996961822073",
+    appId: "1:996961822073:web:0babde6c0d0ef4190f3ba8"
 };
 
 const app = initializeApp(firebaseConfig)
@@ -40,21 +43,14 @@ export async function getVan(id) {
     }
 }
 
-
-
-
-export async function getHostVans(id) {
-    const url = id ? `/api/host/vans/${id}` : "/api/host/vans"
-    const res = await fetch(url)
-    if (!res.ok) {
-        throw {
-            message: "Failed to fetch vans",
-            statusText: res.statusText,
-            status: res.status
-        }
-    }
-    const data = await res.json()
-    return data.vans
+export async function getHostVans() {
+    const q = query(vansCollectionRef, where("hostId", "==", "123"))
+    const snapshot = await getDocs(q)
+    const vans = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id
+    }))
+    return vans
 }
 
 export async function loginUser(creds) {
